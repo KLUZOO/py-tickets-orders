@@ -53,16 +53,13 @@ class MovieViewSet(viewsets.ModelViewSet):
         if title:
             queryset = queryset.filter(title__icontains=title)
 
-        genres = self.request.query_params.getlist("genres")
+        genres = self.request.query_params.get("genres")
         if genres:
-            queryset = queryset.filter(genres__name__in=genres)
+            queryset = queryset.filter(genres__id=genres)
 
-        actors = self.request.query_params.getlist("actors")
+        actors = self.request.query_params.get("actors")
         if actors:
-            queryset = queryset.filter(
-                Q(actors__first_name__in=actors)
-                | Q(actors__last_name__in=actors)
-            )
+            queryset = queryset.filter(actors__id=actors)
 
         return queryset.distinct()
 
@@ -94,7 +91,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         if movie_id:
             queryset = queryset.filter(movie_id=movie_id)
 
-        return queryset
+        return queryset.distinct()
 
 
 class OrderViewSet(viewsets.ModelViewSet):
