@@ -1,6 +1,7 @@
 from django.db.models import Q, Count
 from rest_framework import viewsets
 from django.utils.dateparse import parse_date
+from rest_framework.pagination import PageNumberPagination
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 
@@ -16,6 +17,12 @@ from cinema.serializers import (
     MovieListSerializer,
     OrderSerializer, OrderCreateSerializer,
 )
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 2
+    page_size_query_param = "page_size"
+    max_page_size = 4
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -55,7 +62,8 @@ class MovieViewSet(viewsets.ModelViewSet):
 
         genres = self.request.query_params.get("genres")
         if genres:
-            queryset = queryset.filter(genres__id=genres)
+            genre_ids = [int(g) for g in genres.split(",") if g.strip().isdigit()]
+            queryset = queryset.filter(genres__id__in=genre_ids)
 
         actors = self.request.query_params.get("actors")
         if actors:
@@ -96,6 +104,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related("tickets__movie_session")
+    pagination_class = StandardResultsSetPagination
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:

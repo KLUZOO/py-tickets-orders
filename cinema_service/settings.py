@@ -133,7 +133,3 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS":
-        "cinema_service.pagination.StandardResultsSetPagination",
-}
